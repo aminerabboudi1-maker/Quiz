@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>For You 💗</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Comic Sans MS", "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #ffd6e8, #ffeaf4);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff0f6;
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(255, 105, 180, 0.25);
+      text-align: center;
+    }
+
+    h2 {
+      color: #d63384;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 999px;
+      border: none;
+      background: #ff69b4;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #ff4fa3;
+    }
+
+    .option {
+      background: white;
+      border: 2px solid #ffb6d5;
+      color: #d63384;
+    }
+
+    .option:hover {
+      background: #ffe3ef;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 12px;
+      border: 2px solid #ffb6d5;
+      margin-top: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .red {
+      color: #e03131;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .small {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #ff8fb1;
+    }
+
+    .answer {
+      text-align: left;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card" id="app"></div>
+
+  <script>
+    const questions = [
+      { type: "scale", text: "Firstlyyyyyy, how much do you honestly love me?" },
+      { text: "When you miss me, what do you want most?", options: ["Hug me", "Call me", "See me in person"] },
+      { text: "What’s your favorite way I show love?", options: ["Words", "Actions", "Physical affection"] },
+      { text: "If we had free time right now, what would you choose?", options: ["Cuddle and talk", "Go out together", "Night walk together"] },
+      { text: "What makes you smile faster when it’s from me?", options: ["A sweet text", "My voice", "Seeing my face"] },
+      { text: "How do you feel when I hug you?", options: ["Safe", "Happy", "All of the above"] },
+      { text: "What’s your favorite “us” moment?", options: ["Laughing together", "Watching together", "Late night talks together"] },
+      { text: "If I surprised you, you’d prefer… (I know your answer already)", options: ["A love letter", "A thoughtful gift", "Stocks of ramen"] },
+      { text: "What do you crave more from me?", options: ["Reassurance", "Attention", "Affection"] },
+      { text: "When you think about me, you feel…", options: ["Warm", "Loved", "Miss me"] }
+    ];
+
+    let current = 0;
+    let answers = [];
+    let attempts = 0;
+
+    const app = document.getElementById("app");
+
+    function render() {
+      app.innerHTML = "";
+
+      if (current >= questions.length) {
+        app.innerHTML = `
+          <h2>A Letter For You 💌</h2>
+          <p style="color:#d63384; line-height:1.5">
+            My love,<br><br>
+            I made this little quiz not to test you — but to smile at every answer you gave.
+            Every choice, every word, every feeling just reminded me how lucky I am.
+            No matter what you picked… you picked <b>us</b>.
+            <br><br>
+            And I choose you. Always.
+          </p>
+
+          <div>
+            ${answers.map(a => `
+              <div class="answer">
+                <b>${a.q}</b><br/>
+                💗 ${a.a}
+              </div>
+            `).join("")}
+          </div>
+
+          <p class="small">Forever yours 💗</p>
+        `;
+        return;
+      }
+
+      const q = questions[current];
+      const h2 = document.createElement("h2");
+      h2.textContent = q.text;
+      app.appendChild(h2);
+
+      if (q.type === "scale") {
+        const value = document.createElement("div");
+        value.style.fontSize = "32px";
+        value.style.color = "#ff69b4";
+        value.textContent = "100%";
+
+        const range = document.createElement("input");
+        range.type = "range";
+        range.min = 0;
+        range.max = 100;
+        range.value = 100;
+
+        range.oninput = () => value.textContent = range.value + "%";
+
+        const msg = document.createElement("div");
+
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = "Continue 💖";
+
+        btn.onclick = () => {
+          if (range.value == 100) {
+            answers.push({ q: q.text, a: range.value + "%" });
+            current++;
+            render();
+          } else {
+            attempts++;
+            if (attempts === 1) msg.textContent = "Haha I know you're playing..";
+            else if (attempts === 2) msg.textContent = "Actually..?";
+            else {
+              msg.textContent = "Alright then :'(";
+              answers.push({ q: q.text, a: range.value + "%" });
+              current++;
+              render();
+            }
+            msg.className = "red";
+          }
+        };
+
+        app.append(value, range, msg, btn);
+      } else {
+        q.options.forEach(opt => {
+          const b = document.createElement("button");
+          b.className = "btn option";
+          b.textContent = opt;
+          b.onclick = () => {
+            answers.push({ q: q.text, a: opt });
+            current++;
+            render();
+          };
+          app.appendChild(b);
+        });
+
+        const input = document.createElement("input");
+        input.placeholder = "Other…";
+        app.appendChild(input);
+
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = "Continue 💖";
+        btn.onclick = () => {
+          answers.push({ q: q.text, a: input.value || "—" });
+          current++;
+          render();
+        };
+
+        app.appendChild(btn);
+      }
+
+      const small = document.createElement("div");
+      small.className = "small";
+      small.textContent = `${current + 1} / ${questions.length}`;
+      app.appendChild(small);
+    }
+
+    render();
+  </script>
+</body>
+</html>
